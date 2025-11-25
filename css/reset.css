@@ -1,0 +1,14 @@
+body {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  height: 100vh;
+}
+
+/* 해당 텍스트가 있는 태그 스타일 */
+h1,
+h2,
+p {
+  margin: 0; /* 상단 여백 제거 */
+  /* 또는 margin: 0; 으로 전체 제거 */
+}
