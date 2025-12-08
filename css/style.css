@@ -210,8 +210,38 @@
   padding: 10px;
   border-radius: 16px;
   width: 90%;
+  max-height: 90vh;
+  overflow-y: auto;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
   animation: slideUp 0.3s ease-out;
+  display: flex; /* (선택) 내부 정렬을 위해 Flexbox 사용 */
+  flex-direction: column; /* 세로 방향으로 쌓기 */
+  scrollbar-gutter: stable;
+}
+
+/* 1. 스크롤바 전체 영역 */
+.modal-content::-webkit-scrollbar {
+  width: 8px; /* 스크롤바 너비 (좁게) */
+}
+
+/* 2. 스크롤바 막대 (움직이는 부분) */
+.modal-content::-webkit-scrollbar-thumb {
+  background-color: rgba(0, 0, 0, 0.2); /* 반투명한 회색 */
+  border-radius: 10px; /* 막대 자체도 둥글게 */
+  border: 2px solid transparent; /* 여백을 주기 위한 투명 테두리 */
+  background-clip: content-box; /* 테두리 안쪽만 색칠 */
+}
+
+/* 3. 스크롤바 트랙 (배경) */
+.modal-content::-webkit-scrollbar-track {
+  background-color: transparent; /* 배경 투명하게 */
+  border-radius: 10px; /* 트랙도 둥글게 */
+  /* margin-block: 10px; */ /* (선택) 위아래 여백 */
+}
+
+/* 4. (선택) 마우스 올렸을 때 막대 색 진하게 */
+.modal-content::-webkit-scrollbar-thumb:hover {
+  background-color: rgba(0, 0, 0, 0.4);
 }
 
 /* 폼 요소 스타일링 */
@@ -460,18 +490,23 @@ input[type="datetime-local"] {
   overflow: hidden;
   border: 1px solid #ddd;
   background-color: #f8f9fa;
-  display: flex;
-  justify-content: center;
-  align-items: center;
+  display: block;
+  position: relative;
 }
-/* 지도 이미지 자체 */
 #staticMapImg {
-  width: 100%;
-  height: 100%;
-  object-fit: cover; /* 영역 꽉 채우기 */
-  display: none; /* 로딩 전엔 숨김 (JS에서 보여줌) */
-}
+  width: 100%; /* 너비 꽉 채움 */
+  height: 100%; /* [중요] 부모 높이(150px)를 상속받아 꽉 채움 */
 
+  /* display: none;  <-- ❌ 이거 삭제하게! 지도는 항상 자리를 잡고 있어야 해 */
+  /* object-fit: cover; <-- ❌ div에는 안 먹히는 속성이니 삭제 */
+}
+#staticMapImg {
+  width: 100%; /* 너비 꽉 채움 */
+  height: 100%; /* [중요] 부모 높이(150px)를 상속받아 꽉 채움 */
+  pointer-events: none;
+  /* display: none;  <-- ❌ 이거 삭제하게! 지도는 항상 자리를 잡고 있어야 해 */
+  /* object-fit: cover; <-- ❌ div에는 안 먹히는 속성이니 삭제 */
+}
 /* 이미지가 로드되면 보이게 할 클래스 */
 #staticMapImg.visible {
   display: block;

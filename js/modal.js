@@ -39,13 +39,6 @@ let selectedStoreData = null;
 function initSearchModal() {
   if (typeof kakao !== "undefined" && kakao.maps && kakao.maps.services) {
     ps = new kakao.maps.services.Places();
-    staticMap = new kakao.maps.StaticMap(
-      document.getElementById("staticMapImg"),
-      {
-        center: new kakao.maps.LatLng(33.450701, 126.570667), // 이미지 지도의 중심좌표
-        level: 3, // 이미지 지도의 확대
-      }
-    );
 
     console.log("✅ 검색 모달 초기화 완료 (Places 객체 생성됨)");
   } else {
@@ -167,15 +160,31 @@ function openReviewModal() {
   console.log(
     `위치 정보 저장: 위도(${selectedStoreData.y}), 경도(${selectedStoreData.x})`
   );
+  // 👇 [진실의 로그] 브라우저야, 너 지금 얘 크기 몇으로 보고 있니?
+  console.log(
+    "지도 영역 크기:",
+    staticMapImg.offsetWidth,
+    staticMapImg.offsetHeight
+  );
+  setTimeout(() => {
+    staticMapImg.innerHTML = "";
 
-  staticMapOption = {
-    center: new kakao.maps.LatLng(selectedStoreData.y, selectedStoreData.x), // 이미지 지도의 중심좌표
-    level: 3, // 이미지 지도의 확대 레벨
-  };
-  staticMap = new kakao.maps.StaticMap(staticMapImg, staticMapOption);
+    const addressLat = selectedStoreData.y;
+    const addressLng = selectedStoreData.x;
+    const markerPosition = new kakao.maps.LatLng(addressLat, addressLng);
 
-  console.log(staticMap.getCenter());
-  staticMapImg.classList.add("visible");
+    const staticMapOption = {
+      center: markerPosition, // 이미지 지도의 중심좌표
+      level: 3, // 이미지 지도의 확대 레벨
+      marker: {
+        position: markerPosition,
+      },
+    };
+    staticMap = new kakao.maps.StaticMap(staticMapImg, staticMapOption);
+
+    console.log(staticMap.getCenter());
+    staticMapImg.classList.add("visible");
+  }, 100);
 
   // 3. 방문 시간 기본값 (현재 시간)
   const now = new Date();
@@ -192,8 +201,6 @@ function closeReviewModal() {
 
   document.body.style.overflow = "";
   selectedStoreData = null; // 선택 데이터 초기화
-  // 지도 이미지 초기화
-  staticMapImg.src = "";
   staticMapImg.classList.remove("visible");
 }
 
@@ -255,11 +262,54 @@ window.addEventListener("click", (e) => {
 });
 
 // 폼 제출
-reviewForm.addEventListener("submit", (e) => {
+reviewForm.addEventListener("submit", async (e) => {
   e.preventDefault();
 
-  // 데이터 전송 로직...
-  console.log("전송할 가게:", storeNameInput.value);
-  alert("리뷰 등록 완료!");
-  closeReviewModal();
+  if (!storeNameInput.value) {
+    alert("가게를 선택해주세요!");
+    return;
+  }
+
+  const formData = new FormData();
+  const address = storeAddressInput.value.split(" ");
+  const province = address[0]; // 예: "서울특별시", "경기도" 등
+  const city = address[1]; // 예: "강남구", "수원시" 등
+  const district = address[2]; // 예: "역삼동", "영통구" 등
+  const reviewDto = {
+    storeName: storeNameInput.value,
+    storeAddress: storeAddressInput.value,
+    latitude: parseFloat(storeLatInput.value),
+    longitude: parseFloat(storeLngInput.value),
+    visitTime: visitTimeInput.value,
+    category: document.getElementById("category").value,
+    rating: parseInt(document.getElementById("rating").value),
+    content: document.getElementById("reviewText").value,
+    province: province,
+    city: city,
+    district: district,
+  };
+  const jsonBlob = new Blob([JSON.stringify(reviewDto)], {
+    type: "application/json",
+  });
+  formData.append("data", jsonBlob);
+  const file = photoInput.files[0];
+  if (file) {
+    formData.append("images", file);
+  }
+  try {
+    const response = await fetch(`${CONFIG().API_BASE_URL}/api/reviews`, {
+      method: "POST",
+      body: formData,
+    });
+    if (response.ok) {
+      alert("리뷰가 성공적으로 제출되었습니다!");
+      closeReviewModal();
+    } else {
+      const errorData = await response.text();
+      alert(`리뷰 제출에 실패했습니다: ${errorData.message}`);
+    }
+  } catch (error) {
+    console.error("네트워크 오류:", error);
+    alert("네트워크 오류가 발생했습니다. 잠시 후 다시 시도해주세요.");
+  }
 });
