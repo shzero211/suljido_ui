@@ -26,88 +26,213 @@
               <button class="map-review-btn">리뷰 쓰기</button>
             </div>
           </div>
-          <div class="map-info">
-            정보공간입니다.
-          </div>
+          <div class="map-info">정보공간입니다.</div>
         </div>
-       <footer>
+        <footer>
           <a href="">test</a>
         </footer>
-    </div>
-    <div id="reviewModal" class="modal-overlay hidden">
-      <div class="modal-content">
-        <h1>리뷰 작성</h1>
-        <form id="reviewForm">
-          <input type="hidden" id="storeLat" name="latitude">
-          <input type="hidden" id="storeLng" name="longitude">
-          <div class="form-group">
-            <div class="visit-upload-area">
-              <label>방문 일시</label>
-              <input type="datetime-local" id="visitTime">
-            </div>
-            <div class="visit-place-area">
-              <label>방문 장소</label>
-              <input type="text" id="storeName" class="readonly-input" readonly placeholder="가게명">
-              <input type="text" id="storeAddress" class="readonly-input" readonly placeholder="주소">
-              <div class="static-map-wrapper">
-                <div id="staticMapImg"></div>
+      </div>
+      <div id="reviewModal" class="modal-overlay hidden">
+        <div class="modal-content">
+          <h1>리뷰 작성</h1>
+          <form id="reviewForm">
+            <input type="hidden" id="storeLat" name="latitude" />
+            <input type="hidden" id="storeLng" name="longitude" />
+            <div class="form-group">
+              <div class="visit-upload-area">
+                <label>방문 일시</label>
+                <input type="datetime-local" id="visitTime" />
+              </div>
+              <div class="visit-place-area">
+                <label>방문 장소</label>
+                <input
+                  type="text"
+                  id="storeName"
+                  class="readonly-input"
+                  readonly
+                  placeholder="가게명"
+                />
+                <input
+                  type="text"
+                  id="storeAddress"
+                  class="readonly-input"
+                  readonly
+                  placeholder="주소"
+                />
+                <div class="static-map-wrapper">
+                  <div id="staticMapImg"></div>
+                </div>
+              </div>
+              <label>추천주종</label>
+              <select id="category">
+                <option value="beer">맥주</option>
+                <option value="soju">소주</option>
+                <option value="whisky">위스키</option>
+                <option value="wine">와인</option>
+                <option value="traditional_liquor">전통주</option>
+              </select>
+              <label>평점</label>
+              <select id="rating">
+                <option value="5">⭐⭐⭐⭐⭐ (5점)</option>
+                <option value="4">⭐⭐⭐⭐ (4점)</option>
+                <option value="3">⭐⭐⭐ (3점)</option>
+                <option value="2">⭐⭐ (2점)</option>
+                <option value="1">⭐ (1점)</option>
+              </select>
+              <div class="photo-upload-area">
+                <label class="upload-label">사진 등록</label>
+                <input
+                  type="file"
+                  id="photoInput"
+                  name="photo"
+                  accept="image/*"
+                  hidden
+                />
+                <label for="photoInput" class="custom-file-upload">
+                  <span class="upload-icon">+</span> 사진 추가하기
+                </label>
+                <div id="previewContainer" class="preview-container hidden">
+                  <img id="photoPreview" src="" alt="미리보기" />
+                  <button
+                    type="button"
+                    id="removePhotoBtn"
+                    class="remove-photo-btn"
+                  >
+                    X
+                  </button>
+                </div>
+              </div>
+              <label for="reviewText">리뷰 내용</label>
+              <textarea
+                id="reviewText"
+                name="reviewText"
+                class="reviewText"
+                rows="5"
+                cols="50"
+                placeholder="자세한 리뷰를 남겨주세요."
+              ></textarea>
+              <div class="button-group">
+                <button type="button" id="closeBtn" class="btn-cancle">
+                  취소
+                </button>
+                <button type="submit" class="btn-submit">등록</button>
               </div>
             </div>
-            <label>추천주종</label>
-            <select id="category">
-              <option value="beer">맥주</option>
-              <option value="soju">소주</option>
-              <option value="whisky">위스키</option>
-              <option value="wine">와인</option>
-              <option value="traditional_liquor">전통주</option>
-            </select>
-            <label>평점</label>
-            <select id="rating">
-              <option value="5">⭐⭐⭐⭐⭐ (5점)</option>
-              <option value="4">⭐⭐⭐⭐ (4점)</option>
-              <option value="3">⭐⭐⭐ (3점)</option>
-              <option value="2">⭐⭐ (2점)</option>
-              <option value="1">⭐ (1점)</option>
-            </select>
-            <div class="photo-upload-area">
-              <label class="upload-label">사진 등록</label>
-              <input type="file" id="photoInput" name="photo" accept="image/*" hidden>
-              <label for="photoInput" class="custom-file-upload">
-                <span class="upload-icon">+</span> 사진 추가하기
-              </label>
-              <div id="previewContainer" class="preview-container hidden">
-                <img id="photoPreview" src="" alt="미리보기">
-                <button type="button" id="removePhotoBtn" class="remove-photo-btn">X</button>
-              </div>
+          </form>
+        </div>
+      </div>
+
+      <div id="searchModal" class="modal-overlay hidden">
+        <div class="modal-content search-content">
+          <h3>리뷰 남길 곳 찾기 🔍</h3>
+
+          <div class="search-box">
+            <input
+              type="text"
+              id="keywordInput"
+              placeholder="예: 구로역 맛집, 스타벅스"
+            />
+            <button type="button" id="searchBtn" class="btn-search">
+              검색
+            </button>
+          </div>
+
+          <ul id="placesList" class="places-list">
+            <li class="placeholder-text">장소를 검색해주세요.</li>
+          </ul>
+          <div class="button-group">
+            <button
+              type="button"
+              id="closeSearchBtn"
+              class="btn-cancel full-width"
+            >
+              닫기
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div class="map" id="map"></div>
+
+      <div id="bottomSheet" class="bottom-sheet">
+        <div class="sheet-handle-bar">
+          <div class="handle"></div>
+        </div>
+
+        <div class="sheet-content">
+          <div class="sheet-header">
+            <div class="sheet-thumb">
+              <img
+                id="sheetImage"
+                src="/assets/images/default_store.png"
+                alt="가게 이미지"
+              />
             </div>
-            <label for="reviewText">리뷰 내용</label>
-            <textarea id="reviewText" name="reviewText" class="reviewText" rows="5" cols="50" placeholder="자세한 리뷰를 남겨주세요."
-            ></textarea>
-            <div class="button-group">
-              <button type="button" id="closeBtn" class="btn-cancle">취소</button>
-              <button type="submit" class="btn-submit">등록</button>
+
+            <div class="sheet-info">
+              <h3 id="sheetTitle" class="sheet-title">가게 이름</h3>
+              <p class="sheet-category">
+                <span id="sheetCategoryBadge" class="badge">소주</span>
+                <span class="rating">⭐ <span id="sheetRating">0.0</span></span>
+              </p>
+              <p id="sheetAddress" class="sheet-addr">
+                주소 정보가 여기에 표시됩니다.
+              </p>
             </div>
           </div>
-        </form>
+
+          <div class="sheet-actions">
+            <button id="btnDetail" class="btn-primary full-width">
+              리뷰 보러가기
+            </button>
+          </div>
+        </div>
       </div>
-    </div>
-
-    <div id="searchModal" class="modal-overlay hidden">
-      <div class="modal-content search-content">
-        <h3>리뷰 남길 곳 찾기 🔍</h3>
-        
-        <div class="search-box">
-          <input type="text" id="keywordInput" placeholder="예: 구로역 맛집, 스타벅스">
-          <button type="button" id="searchBtn" class="btn-search">검색</button>
+      <div id="reviewDetailPage" class="full-page-layer">
+        <div class="review-header">
+          <button id="btnCloseReview" class="icon-btn">
+            <svg
+              width="24"
+              height="24"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+            >
+              <path d="M15 18l-6-6 6-6" />
+            </svg>
+          </button>
+          <h2 id="reviewStoreTitle">가게 이름</h2>
+          <div style="width: 24px"></div>
         </div>
 
-        <ul id="placesList" class="places-list">
-          <li class="placeholder-text">장소를 검색해주세요.</li>
-        </ul>
-        <div class="button-group">
-          <button type="button" id="closeSearchBtn" class="btn-cancel full-width">닫기</button>
+        <div class="review-content">
+          <div class="rating-summary">
+            <div class="big-score" id="reviewAvgScore">4.5</div>
+            <div class="stars">⭐⭐⭐⭐⭐</div>
+            <div class="count">
+              전체 리뷰 <span id="reviewTotalCount">12</span>개
+            </div>
+          </div>
+
+          <hr class="divider" />
+
+          <ul id="reviewList" class="review-list"></ul>
         </div>
-        
+
+        <button class="fab-write-btn">
+          <svg
+            width="24"
+            height="24"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="white"
+            stroke-width="2"
+          >
+            <path d="M12 5v14M5 12h14" />
+          </svg>
+          <span>리뷰 쓰기</span>
+        </button>
       </div>
     </div>
   </body>

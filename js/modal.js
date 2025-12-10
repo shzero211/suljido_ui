@@ -57,6 +57,7 @@ window.initSearchModal = initSearchModal;
 // 검색 모달 열기
 function openSearchModal() {
   console.log("openSearchModal 동작");
+  closeBottomSheet(); // 바텀시트 닫기
   searchModal.classList.remove("hidden");
   document.body.style.overflow = "hidden";
 
