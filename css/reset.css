@@ -1,8 +1,11 @@
+html,
 body {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
-  height: 100vh;
+  overflow: hidden;
+  width: 100%;
+  height: 100%;
 }
 
 /* 해당 텍스트가 있는 태그 스타일 */

@@ -358,31 +358,8 @@ async function openReviewPage(storeId, storeName) {
     // const response = await ApiClient.get(`/api/stores/${storeId}/reviews`);
     // const reviews = response.data;
 
-    // --- [테스트용 더미 데이터] 실제 구현 시 삭제 ---
-    await new Promise((resolve) => setTimeout(resolve, 500)); // 0.5초 로딩 시뮬레이션
-    const reviews = [
-      {
-        id: 1,
-        author: "맛객",
-        rating: 5,
-        text: "이 집 분위기 미쳤네요. 강추!",
-        date: "2023-10-27",
-      },
-      {
-        id: 2,
-        author: "동네주민",
-        rating: 4,
-        text: "맛은 있는데 웨이팅이 좀...",
-        date: "2023-10-26",
-      },
-      {
-        id: 3,
-        author: "초코파이",
-        rating: 3,
-        text: "그냥 평범했습니다.",
-        date: "2023-10-25",
-      },
-    ];
+    const response = await ApiClient.get(`/api/reviews/${storeId}`);
+    const reviews = response.data;
     // -------------------------------------------
 
     // 4. 가져온 데이터로 화면 그리기 (이전에 만든 함수 활용)
@@ -424,17 +401,36 @@ function renderReviews(reviews) {
 
     // 별점 문자열 생성 (예: 4 -> ⭐⭐⭐⭐)
     const stars = "⭐".repeat(Math.floor(review.rating));
-
+    const reviewDate = timeAgo(review.createdAt);
     li.innerHTML = `
             <div class="review-meta">
                 <span class="review-author">${review.author}</span>
-                <span class="review-date">${review.date || "최근"}</span>
+                <span class="review-date">${reviewDate}</span>
             </div>
             <div style="color: #FFD700; font-size: 12px; margin-bottom: 6px;">${stars}</div>
-            <div class="review-text">${review.text}</div>
+            <div class="review-text">${review.content}</div>
         `;
     list.appendChild(li);
   });
+}
+
+function timeAgo(dateString) {
+  const date = new Date(dateString);
+  const now = new Date();
+  const seconds = Math.floor((now - date) / 1000);
+  const minutes = Math.floor(seconds / 60);
+  const hours = Math.floor(minutes / 60);
+  const days = Math.floor(hours / 24);
+
+  if (seconds < 60) return "방금 전";
+  if (minutes < 60) return `${minutes}분 전`;
+  if (hours < 24) return `${hours}시간 전`;
+  if (days < 7) return `${days}일 전`;
+
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, "0");
+  const day = String(date.getDate()).padStart(2, "0");
+  return `${year}-${month}-${day}`;
 }
 
 function closeReviewPage() {
