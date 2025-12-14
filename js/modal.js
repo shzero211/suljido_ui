@@ -300,14 +300,17 @@ reviewForm.addEventListener("submit", async (e) => {
   try {
     const response = await fetch(`${CONFIG().API_BASE_URL}/api/reviews`, {
       method: "POST",
+      headers: {
+        "X-TEST-EMAIL": "shzero211@naver.com",
+      },
       body: formData,
     });
     if (response.ok) {
       alert("리뷰가 성공적으로 제출되었습니다!");
       closeReviewModal();
     } else {
-      const errorData = await response.text();
-      alert(`리뷰 제출에 실패했습니다: ${errorData.message}`);
+      const errorJson = await response.json(); // JSON으로 시도
+      alert(`실패: ${errorJson.message || JSON.stringify(errorJson)}`);
     }
   } catch (error) {
     console.error("네트워크 오류:", error);
