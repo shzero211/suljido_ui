@@ -1,1 +1,2 @@
 / /mockup.html 200
+/api/* http://13.125.68.104:8080/api/:splat  200
