@@ -396,12 +396,19 @@ function renderReviews(reviews) {
   }
 
   reviews.forEach((review) => {
+    const hostname = window.location.hostname;
+    const isLocal = hostname === "localhost" || hostname === "127.0.0.1";
+    const BACKEND_URL = isLocal ? "http://localhost:8080" : "";
+
     const li = document.createElement("li");
     li.className = "review-item";
 
     // 별점 문자열 생성 (예: 4 -> ⭐⭐⭐⭐)
     const stars = "⭐".repeat(Math.floor(review.rating));
     const reviewDate = timeAgo(review.createdAt);
+    const imageUrl = BACKEND_URL + review.imagesUrls[0];
+    console.log(imageUrl);
+
     li.innerHTML = `
             <div class="review-meta">
                 <span class="review-author">${review.author}</span>
@@ -409,7 +416,7 @@ function renderReviews(reviews) {
             </div>
             <div style="color: #FFD700; font-size: 12px; margin-bottom: 6px;">${stars}</div>
             <div>
-              <img src="${review.images[0]}" style='max-width: 500px;' alt="리뷰 이미지"/>
+              <img src="${imageUrl}" style='max-width: 100px;' alt="리뷰 이미지"/>
             </div>
             <div class="review-text">${review.content}</div>
         `;
