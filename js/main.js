@@ -408,6 +408,9 @@ function renderReviews(reviews) {
                 <span class="review-date">${reviewDate}</span>
             </div>
             <div style="color: #FFD700; font-size: 12px; margin-bottom: 6px;">${stars}</div>
+            <div>
+              <img src="${review.images[0]}" style='max-width: 500px;' alt="리뷰 이미지"/>
+            </div>
             <div class="review-text">${review.content}</div>
         `;
     list.appendChild(li);
