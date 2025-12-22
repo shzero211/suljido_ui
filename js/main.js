@@ -14,6 +14,9 @@ let sheetAddress = null;
 let btnDetail = null;
 let sheetHandle = null;
 let currentStoreId = null;
+let detailStoreData = null;
+let currentStoreName = null;
+let reviewDetailWriteBtn = null;
 
 //리뷰 상세보기 변수 요소
 let reviewDetailPage = null;
@@ -46,6 +49,7 @@ document.addEventListener("DOMContentLoaded", () => {
   btnCloseReview = document.getElementById("btnCloseReview");
   reviewStoreTitle = document.getElementById("reviewStoreTitle");
   reviewListContainer = document.getElementById("reviewList");
+  reviewDetailWriteBtn = document.getElementById("reviewDetailWriteBtn");
 
   // 1. 바텀 시트의 "리뷰 보러가기" 버튼 클릭 시
   // (기존 코드에 있는 btnDetail 변수 사용)
@@ -58,10 +62,52 @@ document.addEventListener("DOMContentLoaded", () => {
       }
 
       // 현재 바텀 시트에 떠 있는 가게 이름을 가져옴
-      const currentStoreName = sheetTitle.innerText;
+      //const currentStoreName = sheetTitle.innerText;
 
       // 리뷰 페이지 열기 함수 호출!
-      openReviewPage(currentStoreId, currentStoreName);
+      openReviewPage(detailStoreData, currentStoreId, currentStoreName);
+    });
+  }
+
+  if (reviewDetailWriteBtn) {
+    //4.가게 리뷰 상세 보기내의 리뷰쓰기 버튼 클릭 이벤트
+    reviewDetailWriteBtn.addEventListener("click", () => {
+      var reviewDetailLat = detailStoreData.lat;
+      var reviewDetailLng = detailStoreData.lng;
+
+      console.log(`reviewDetailLat:${reviewDetailLat}`);
+      console.log(`reviewDetailLng:${reviewDetailLng}`);
+      console.log(`currentStoreName:${currentStoreName}`);
+
+      var ps = new kakao.maps.services.Places();
+
+      // 검색 옵션 설정 (핵심)
+      var storeSearchOptions = {
+        location: new kakao.maps.LatLng(reviewDetailLat, reviewDetailLng), // 이미 알고 있는 가게 좌표
+        radius: 50, // 좌표 반경 50m 내에서만 검색 (오차 보정)
+        sort: kakao.maps.services.SortBy.DISTANCE, // 거리순 정렬
+      };
+
+      function storeSearchCB(data, status, pagination) {
+        if (status === kakao.maps.services.Status.OK) {
+          // 검색 결과 중 첫 번째(가장 가까운) 결과가 해당 가게일 확률이 매우 높음
+          var targetPlace = data[0];
+
+          if (window.selectPlace) {
+            closeBottomSheet();
+            closeReviewPage();
+            selectPlace(targetPlace);
+          }
+          console.log(targetPlace.id); // 카카오 맵 Place ID
+          console.log(targetPlace.place_name); // 가게 이름
+          console.log(targetPlace.place_url); // 카카오 맵 상세 페이지 URL (리뷰 쓰기 링크 포함됨)
+          console.log(JSON.stringify(targetPlace, null, 2));
+        } else {
+          alert("리뷰를 작성할 가게정보가 존재하지않습니다.");
+        }
+      }
+
+      ps.keywordSearch(currentStoreName, storeSearchCB, storeSearchOptions);
     });
   }
 
@@ -325,6 +371,8 @@ function openBottomSheet(store) {
 
   // ID 저장 (상세보기 클릭 시 사용)
   currentStoreId = store.id;
+  detailStoreData = store;
+  currentStoreName = store.name;
 
   // (2) 시트 올리기 (애니메이션 시작)
   bottomSheet.classList.add("active");
@@ -336,7 +384,7 @@ function closeBottomSheet() {
 }
 
 //리뷰 상세보기 페이지 열기
-async function openReviewPage(storeId, storeName) {
+async function openReviewPage(detailStoreData, storeId, storeName) {
   console.log(`리뷰 페이지 열기 시도: ID ${storeId}, 이름 ${storeName}`);
 
   // 1. UI 초기 세팅
@@ -361,6 +409,8 @@ async function openReviewPage(storeId, storeName) {
     const response = await ApiClient.get(`/api/reviews/${storeId}`);
     const reviews = response.data;
     // -------------------------------------------
+    console.log(`response:${response}`);
+    console.log(`reviews:${reviews}`);
 
     // 4. 가져온 데이터로 화면 그리기 (이전에 만든 함수 활용)
     renderReviews(reviews);
@@ -406,8 +456,17 @@ function renderReviews(reviews) {
     // 별점 문자열 생성 (예: 4 -> ⭐⭐⭐⭐)
     const stars = "⭐".repeat(Math.floor(review.rating));
     const reviewDate = timeAgo(review.createdAt);
-    const imageUrl = BACKEND_URL + review.imagesUrls[0];
-    console.log(imageUrl);
+    console.log(`review.imagesUrls:${review.imagesUrls}`);
+
+    let imageAreaHtml = "";
+    if (review.imagesUrls.length > 0) {
+      const imageUrl = BACKEND_URL + review.imagesUrls[0];
+      imageAreaHtml = `
+            <div style="margin: 8px 0;">
+              <img src="${imageUrl}" style='max-width: 100px;' alt="리뷰 이미지"/>
+            </div>
+      `;
+    }
 
     li.innerHTML = `
             <div class="review-meta">
@@ -415,9 +474,7 @@ function renderReviews(reviews) {
                 <span class="review-date">${reviewDate}</span>
             </div>
             <div style="color: #FFD700; font-size: 12px; margin-bottom: 6px;">${stars}</div>
-            <div>
-              <img src="${imageUrl}" style='max-width: 100px;' alt="리뷰 이미지"/>
-            </div>
+              ${imageAreaHtml}
             <div class="review-text">${review.content}</div>
         `;
     list.appendChild(li);

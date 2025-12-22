@@ -131,16 +131,25 @@ function selectPlace(place) {
   // 3. 리뷰 모달 열기 호출
   openReviewModal();
 }
-
+window.selectPlace = selectPlace;
 // ==========================================
 // 3. 리뷰 작성 모달 로직 (2단계)
 // ==========================================
 
 function openReviewModal() {
   const apiKey = CONFIG().KAKAO_MAP_API_KEY;
+  // console.log(
+  //   `selectedStoreData.category_group_code: ${selectedStoreData.category_group_code}`
+  // );
+
   // 가게가 선택되지 않았으면 방어
   if (!selectedStoreData) {
     alert("가게를 먼저 선택해주세요.");
+    return;
+  }
+
+  if (selectedStoreData.category_group_code !== "FD6") {
+    alert("선택된 가게는 음식점이 아닙니다.");
     return;
   }
 
