@@ -202,44 +202,6 @@ footer .footer-list {
   background-repeat: no-repeat;
   background-position: center;
 }
-.map-review {
-  position: absolute;
-  top: 10px;
-  right: 10px;
-  width: 90px;
-  height: 30px;
-  z-index: 100;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-.map-review-btn {
-  width: inherit;
-  height: inherit;
-  border-radius: 30px;
-  background-color: #007bff;
-  color: white;
-  border: none;
-  font-size: 13px;
-  font-weight: 500;
-  box-shadow: 0 4px 12px rgba(0, 123, 255, 0.4);
-  transition: all 0.2s ease-in-out;
-}
-
-.map-review-btn::before {
-  content: "+";
-  margin-right: 5px;
-  font-size: 20px;
-  height: inherit;
-  display: inline-block;
-  transform: translateY(1.5px);
-}
-.map-review-btn:active {
-  transform: scale(0.96); /* 살짝 작아지는 효과 */
-  box-shadow: 0 2px 6px rgba(0, 123, 255, 0.3); /* 그림자 줄어듦 */
-  background-color: #0056b3; /* 색상을 약간 어둡게 */
-}
-
 /*모달 설정*/
 .modal-overlay {
   position: fixed;
@@ -875,10 +837,9 @@ input[type="datetime-local"] {
   position: absolute;
   top: 10px;
   left: 16px;
-  right: 103px;
   z-index: 1000;
   display: flex;
-  gap: 10px;
+  gap: 4px;
   align-items: flex-start;
 }
 
@@ -892,7 +853,7 @@ input[type="datetime-local"] {
 .search-bar {
   height: 30px; /* 버튼 높이와 동일하게 설정 */
   background: #ffffff;
-  border-radius: 8px; /* 모서리 둥글게 */
+  border-radius: 30px; /* 모서리 둥글게 */
   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.15); /* 부드러운 그림자 */
   display: flex;
   align-items: center; /* 내부 아이콘/텍스트 수직 정렬 */
@@ -940,9 +901,9 @@ input[type="datetime-local"] {
 .autocomplete-list {
   display: none;
   position: absolute;
-  top: 48px; /* 검색창 높이(44px) + 여백(4px) */
+  top: 34px; /* 검색창 높이(44px) + 여백(4px) */
   left: 0;
-  right: 0;
+  right: 4px;
   background: white;
   border-radius: 8px;
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
@@ -963,4 +924,48 @@ input[type="datetime-local"] {
 
 .autocomplete-list li:hover {
   background-color: #f9f9f9;
+}
+
+.map-review {
+  position: relative;
+  width: 90px;
+  height: 30px;
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.map-review-btn {
+  width: inherit;
+  height: inherit;
+  border-radius: 30px;
+  background-color: #007bff;
+  color: white;
+  border: none;
+  font-size: 13px;
+  font-weight: 500;
+  box-shadow: 0 4px 12px rgba(0, 123, 255, 0.4);
+  transition: all 0.2s ease-in-out;
+}
+
+.map-review-btn::before {
+  content: "+";
+  margin-right: 5px;
+  font-size: 20px;
+  height: inherit;
+  display: inline-block;
+  transform: translateY(1.5px);
+}
+.map-review-btn:active {
+  transform: scale(0.96); /* 살짝 작아지는 효과 */
+  box-shadow: 0 2px 6px rgba(0, 123, 255, 0.3); /* 그림자 줄어듦 */
+  background-color: #0056b3; /* 색상을 약간 어둡게 */
+}
+
+.highlight {
+  background-color: #fff5b1; /* 연한 노란색 배경 */
+  color: #333; /* 글자색은 진하게 */
+  font-weight: bold;
+  padding: 0 2px; /* 좌우 여백 살짝 */
+  border-radius: 2px; /* 모서리 살짝 둥글게 */
 }

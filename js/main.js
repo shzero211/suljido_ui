@@ -29,6 +29,13 @@ let imageSize = null;
 let imageOption = null;
 let markerImage = null;
 
+//메인 검색창 관련 변수요소
+let searchBar = null;
+let input = null;
+let clearBtn = null;
+let list = null;
+let debounceTimeout = null;
+
 document.addEventListener("DOMContentLoaded", () => {
   const apiKey = CONFIG().KAKAO_MAP_API_KEY;
   console.log(`API_KEY: ${apiKey}`);
@@ -50,6 +57,11 @@ document.addEventListener("DOMContentLoaded", () => {
   reviewStoreTitle = document.getElementById("reviewStoreTitle");
   reviewListContainer = document.getElementById("reviewList");
   reviewDetailWriteBtn = document.getElementById("reviewDetailWriteBtn");
+
+  searchBar = document.getElementById("searchBar");
+  input = document.getElementById("mainKeywordInput");
+  clearBtn = document.getElementById("mainClearBtn");
+  list = document.getElementById("mainAutocompleteList");
 
   // 1. 바텀 시트의 "리뷰 보러가기" 버튼 클릭 시
   // (기존 코드에 있는 btnDetail 변수 사용)
@@ -127,6 +139,133 @@ document.addEventListener("DOMContentLoaded", () => {
     }
     // 만약 바텀시트도 히스토리로 관리하고 싶다면 여기에 추가 로직 작성
   });
+
+  if (input) {
+    // ▼ 입력 이벤트 리스너 시작
+    input.addEventListener("input", (e) => {
+      const keyword = e.target.value.trim();
+      console.log(`keyword:${keyword}`);
+
+      // [수정 1] 스코프 수정: 이 로직들이 이벤트 리스너 '안'에 있어야 합니다.
+
+      // X 버튼 표시 여부
+      if (clearBtn) {
+        clearBtn.style.display = keyword.length > 0 ? "block" : "none";
+      }
+
+      // 검색어가 없으면 리스트 닫고 종료
+      if (keyword.length === 0) {
+        closeList();
+        return;
+      }
+
+      // 디바운싱 (타이핑 멈출 때까지 대기)
+      if (debounceTimeout) clearTimeout(debounceTimeout);
+      debounceTimeout = setTimeout(() => {
+        fetchAutocomplete(keyword);
+      }, 300);
+    });
+    // ▲ 입력 이벤트 리스너 끝
+
+    // 2. 함수 정의 (가독성을 위해 리스너 밖, if문 안에 위치)
+    async function fetchAutocomplete(keyword) {
+      try {
+        // ApiClient가 있다고 가정
+        const response = await ApiClient.get(
+          `/api/search?keyword=${encodeURIComponent(keyword)}`
+        );
+
+        // [수정 2] 대소문자 수정: response.OK (x) -> response.ok (o)
+        // (만약 ApiClient가 fetch wrapper라면 response.status === 200 체크 필요할 수 있음)
+        if (response.ok === false)
+          throw new Error("Network response was not ok");
+
+        const data = await response;
+        renderList(data, keyword);
+      } catch (error) {
+        console.log("검색실패:", error);
+      }
+    }
+
+    function renderList(stores, keyword) {
+      if (!list) return;
+      list.innerHTML = "";
+
+      if (!stores || stores.length === 0) {
+        closeList();
+        return;
+      }
+
+      stores.forEach((store) => {
+        const li = document.createElement("li");
+
+        // [수정 3] 오타 수정: replact -> replace
+        const nameHtml = store.name.replace(
+          new RegExp(keyword, "gi"),
+          (match) => `<span class="highlight">${match}</span>`
+        );
+
+        const addressHtml = store.searchAddress.replace(
+          new RegExp(keyword, "gi"),
+          (match) => `<span class="highlight">${match}</span>`
+        );
+
+        li.innerHTML = `
+        <div class="store-name">${nameHtml}</div>
+        <div class="store-address">${addressHtml}</div>
+      `;
+
+        list.appendChild(li);
+
+        li.addEventListener("click", () => {
+          // 가게 선택 시 동작 (인풋에 값 채우기 등)
+          input.value = store.name;
+          // if (typeof selectPlace === 'function') selectPlace(store);
+          closeList();
+
+          const lat = store.location.lat;
+          const lon = store.location.lon;
+          console.log(`lat:${lat}`);
+          console.log(`lon:${lon}`);
+
+          if (lat && lon) {
+            const moveLatLng = new kakao.maps.LatLng(lat, lon);
+            map.panTo(moveLatLng);
+
+            openBottomSheet(store);
+
+            console.log("이동완료");
+          } else {
+            console.warn("위치 정보가 없습니다.");
+          }
+        });
+      });
+
+      openList();
+    }
+
+    function openList() {
+      if (list) list.style.display = "block";
+      if (searchBar) searchBar.classList.add("open");
+    }
+
+    function closeList() {
+      if (list) list.style.display = "none";
+      if (searchBar) searchBar.classList.remove("open"); // 보통 add('close')보다 remove('open')을 씁니다.
+    }
+
+    function clearMainSearch() {
+      input.value = "";
+      if (clearBtn) clearBtn.style.display = "none";
+      closeList();
+      input.focus();
+    }
+
+    // 3. 클리어 버튼 이벤트 연결
+    if (clearBtn) {
+      clearBtn.addEventListener("click", clearMainSearch);
+    }
+  }
 });
 
 //지도 초기 설정
