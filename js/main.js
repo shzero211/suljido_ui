@@ -17,6 +17,8 @@ let currentStoreId = null;
 let detailStoreData = null;
 let currentStoreName = null;
 let reviewDetailWriteBtn = null;
+let sheetThumb = null;
+let sheetReviewCount = null;
 
 //리뷰 상세보기 변수 요소
 let reviewDetailPage = null;
@@ -50,6 +52,8 @@ document.addEventListener("DOMContentLoaded", () => {
   sheetAddress = document.getElementById("sheetAddress");
   btnDetail = document.getElementById("btnDetail");
   sheetHandle = document.querySelector(".sheet-handle-bar");
+  sheetThumb = document.querySelector(".sheet-thumb");
+  sheetReviewCount = document.getElementById("sheetReviewCount");
 
   //리뷰 상세보기 변수 요소
   reviewDetailPage = document.getElementById("reviewDetailPage");
@@ -490,6 +494,20 @@ function renderMarkers(datas) {
   });
 }
 
+// 색상 팔레트 (파스텔톤 추천)
+const AVATAR_COLORS = [
+  "#FF6B6B",
+  "#FFD93D",
+  "#6BCB77",
+  "#4D96FF",
+  "#9D4EDD",
+  "#FF9F43",
+  "#0ABDE3",
+  "#EE5253",
+  "#10AC84",
+  "#222f3e",
+];
+
 //바텀 시트
 function openBottomSheet(store) {
   console.log("바텀 시트 열기:", store);
@@ -498,14 +516,32 @@ function openBottomSheet(store) {
   sheetAddress.innerText = store.fullAddress || "주소 정보 없음";
 
   // 평점 (데이터 없으면 0.0)
-  sheetRating.innerText = (store.rating || 0.0).toFixed(1);
+  sheetReviewCount.innerText = `(${store.reviewCount || 0})`;
+  sheetRating.innerText = (store.avgRating || 0.0).toFixed(1);
+  sheetCategory.innerText = store.bestCategory || "카테고리 정보 없음";
 
   // 이미지 (없으면 기본 이미지)
   if (store.image_url) {
-    sheetImage.src = store.image_url;
+    sheetThumb.innerHTML = `
+      <img id="sheetImage" 
+          src="${store.image_url}"
+          alt="${store.name}"
+          onerror="
+          this.style.display='none'; 
+          this.parentNode.innerHTML='
+            <div class=\\'text-avatar\\' style=\\'background-color:#ccc\\'>
+              ?
+            </div>'"
+      />
+    `;
   } else {
-    // 기본 이미지 경로 확인 필요!
-    sheetImage.src = "/assets/images/default_store.png";
+    const firstChar = store.name.charAt(0);
+    const colorIndex = store.name.length % AVATAR_COLORS.length;
+    const bgColor = AVATAR_COLORS[colorIndex];
+    sheetThumb.innerHTML = `
+      <div class="text-avatar" style="background-color:${bgColor}">
+        ${firstChar}
+      </div>`;
   }
 
   // ID 저장 (상세보기 클릭 시 사용)
